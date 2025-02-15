@@ -6,9 +6,9 @@
 
 typedef struct {
 
-    int vitoriasUs1;
-    int vitoriasUs2;
+    int vitorias[2];
     int empates;
+    char nome[2][50];
 
 }Usuario;
 
@@ -17,6 +17,7 @@ typedef struct {
     int vitorias;
     int empates;
     int derrotas;
+    char nome[50];
 
 }CPU;
 
@@ -31,6 +32,7 @@ typedef struct {
 typedef struct {
 
     char tab[3][3];
+    int jogadas[2][5]; // 2 jogadores com no máximo 5 jogadas
     Casa casas;
     CPU cpu;
     Usuario usuario;
@@ -42,14 +44,17 @@ Jogo jogo = {
     // tab[3][3]
     {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}},
 
+    // jogadas[2][5]
+    {{-1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1} },
+
     // struct casas
     { {0}, {1, 2, 3, 4, 5, 6, 7, 8, 9}, 0 },
 
     // struct cpu
-    {0, 0, 0},
+    {0, 0, 0, {'U','s','u','á','r','i','o'}}, // Nome padrão: "Usuário"
 
     //struct usuario
-    {0, 0, 0}
+    {{0}, 0, { {'U','s','u','á','r','i','o',' ','1'}, {'U','s','u','á','r','i','o',' ','2'}}} // Nomes padrão: "Usuário 1" e "Usuário 2"
 };
 
 
