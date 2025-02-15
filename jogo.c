@@ -58,7 +58,7 @@ Jogo jogo = {
 };
 
 
-int inicio(){
+int menu(){
 	int decisao = -1;
 
 	printf("---------------------Jogo da Velha-----------------------");
@@ -66,9 +66,9 @@ int inicio(){
 	printf("\n");
 	printf("Escolha:");
 	printf("\n");
-	printf("1 - Você começa jogando");
+	printf("1 - Novo jogo");
 	printf("\n");
-	printf("2 - A CPU começa jogando");
+	printf("2 - Configurações");
 	printf("\n");
 	printf("0 - Encerrar o programa");
 	printf("\n");
@@ -84,8 +84,55 @@ int inicio(){
 	return decisao;
 }
 
+int novoJogo(){
+    int decisao = -1;
+
+    printf("Escolha:");
+	printf("\n");
+	printf("1 - Jogador x CPU");
+	printf("\n");
+	printf("2 - Jogador x Jogador");
+	printf("\n");
+	printf("0 - Voltar");
+	printf("\n");
+	printf("\n");
+
+	printf("Resposta: ");
+	scanf("%d", &decisao);
+	printf("\n");
+	printf("---------------------------------------------------------");
+	printf("\n");
+	printf("\n");
+
+	return decisao;
+}
+
+int configGeral(){
+    int decisao = -1;
+
+    printf("Escolha:");
+	printf("\n");
+	printf("1 - Alterar símbolos da partida");
+	printf("\n");
+	printf("2 - Configuração de Jogador x CPU");
+	printf("\n");
+	printf("3 - Configuração de Jogador x Jogador");
+	printf("\n");
+	printf("0 - Voltar");
+	printf("\n");
+	printf("\n");
+
+	printf("Resposta: ");
+	scanf("%d", &decisao);
+	printf("\n");
+	printf("---------------------------------------------------------");
+	printf("\n");
+	printf("\n");
+
+    return decisao;
+}
+
 int tabuleiro(){
-	int casa = -1;
 
 	printf("    |     |               |    |    \n");
 	printf(" %c  |  %c  |  %c         1  | 2  | 3  \n", jogo.tab[0][0], jogo.tab[0][1], jogo.tab[0][2]);
@@ -98,6 +145,7 @@ int tabuleiro(){
 	printf("    |     |               |    |    \n");
 	printf("\n");
 
+	int casa = -1;
 	printf("Resposta: ");
 	scanf("%d", &casa);
 	printf("\n");
@@ -210,44 +258,116 @@ bool verificarVitoria(char simbolo){
 
 int main(){
 	setlocale(LC_ALL, "C.UTF-8");
-	bool repetir = false;
+	bool repetirMenu = false;
 
 	do{
 
-		int decisao = inicio();
+		int decisao = menu();
 
+		// Validação da entrada do usuário
 		if(decisao != 1 && decisao != 2 && decisao != 0){
 			printf("Não existe essa opção! Escolha uma opção existente!");
 			printf("\n");
 			printf("\n");
-			repetir = true;
+			while (getchar() != '\n'); // Limpa o buffer de entrada
+			repetirMenu = true;
 		}
+		// Novo Jogo:
 		else if(decisao == 1){
+            decisao = -1;
+            bool repetirNovoJogo = false;
 
-            bool continuar = false;
-			do{
-				int casa = tabuleiro();
-				if(casa < 1 || casa > 9){
-					mensagemErro("Não existe uma casa com esse número! Digite um número válido!");
-					continuar = true;
-					continue;
-				}
-				bool usando = verificarCasa(casa);
-				if(usando){
-					mensagemErro("Erro! A casa selecionada já está sendo usada!");
-					continuar = true;
-					continue;
-				}
-				else{
-					marcarTabuleiro(casa, 'X');
-					continuar = true;
+            do{
+                decisao = novoJogo();
+
+                // Validação da entrada do usuário
+                if(decisao != 1 && decisao != 2 && decisao != 0){
+                    printf("Não existe essa opção! Escolha uma opção existente!");
+                    printf("\n");
+                    printf("\n");
+                    while (getchar() != '\n'); // Limpa o buffer de entrada
+                    repetirNovoJogo = true;
+                }
+                // Jogador x CPU:
+                else if(decisao == 1){
+
+                    bool repetirTab = false;
+                    do{
+                        int casa = tabuleiro();
+                        if(casa < 1 || casa > 9){
+                            mensagemErro("Não existe uma casa com esse número! Digite um número válido!");
+                            repetirTab = true;
+                            continue;
+                        }
+                        bool usando = verificarCasa(casa);
+                        if(usando){
+                            mensagemErro("Erro! A casa selecionada já está sendo usada!");
+                            repetirTab = true;
+                            continue;
+                        }
+                        else{
+                            marcarTabuleiro(casa, 'X');
+                            repetirTab = true;
 
 
-				}
+                        }
 
-			} while(continuar);
+                    } while(repetirTab);
+
+                }
+                // Jogador x Jogador
+                else if(decisao == 2){
+
+
+
+
+                }
+                // Voltar para o Menu principal
+                else if(decisao == 0){
+                    repetirMenu = true;
+                    repetirNovoJogo = false;
+                    break;
+                }
+
+
+            } while(repetirNovoJogo);
+
+
 		}
+		// Configurações
 		else if(decisao == 2){
+            decisao = -1;
+            bool repetirConfigGeral = false;
+
+            do{
+
+                decisao = configGeral();
+
+                // Validação da entrada do usuário
+                if(decisao != 1 && decisao != 2 && decisao != 3 && decisao != 0){
+                    printf("Não existe essa opção! Escolha uma opção existente!");
+                    printf("\n");
+                    printf("\n");
+                    while (getchar() != '\n'); // Limpa o buffer de entrada
+                    repetirConfigGeral = true;
+                }
+                else if(decisao == 1){
+
+                }
+                else if(decisao == 2){
+
+                }
+                else if(decisao == 3){
+
+                }
+                // Voltar para o Menu principal
+                else if(decisao == 0){
+                    repetirMenu = true;
+                    repetirConfigGeral = false;
+                    break;
+                }
+
+            } while(repetirConfigGeral);
 
 		}
 		else if(decisao == 0){
@@ -256,9 +376,10 @@ int main(){
 			printf("\n");
             printf("---------------------------------------------------------");
             printf("\n");
-			repetir = false;
+			repetirMenu = false;
 		}
-	} while(repetir);
+
+	} while(repetirMenu);
 
 	return 0;
 
