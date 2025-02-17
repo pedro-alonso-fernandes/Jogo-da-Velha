@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <locale.h>
+#include <string.h>
 
 
 typedef struct {
@@ -55,10 +56,10 @@ Jogo jogo = {
     { {0}, {1, 2, 3, 4, 5, 6, 7, 8, 9}, 0 },
 
     // struct cpu
-    {0, 0, 0, {'U','s','u','á','r','i','o'}}, // Nome padrão: "Usuário"
+    {0, 0, 0, {'J','o','g','a','d','o','r'}}, // Nome padrão: "Jogador"
 
     // struct usuario
-    {{0}, 0, { {'U','s','u','á','r','i','o',' ','1'}, {'U','s','u','á','r','i','o',' ','2'}}} // Nomes padrão: "Usuário 1" e "Usuário 2"
+    {{0}, 0, { {'J','o','g','a','d','o','r',' ','1'}, {'J','o','g','a','d','o','r',' ','2'}}} // Nomes padrão: "Jogador 1" e "Jogador 2"
 };
 
 
@@ -148,6 +149,34 @@ int configSimbolos(){
     printf("1 - Alterar símbolos");
     printf("\n");
     printf("2 - Restaurar símbolos padrão");
+    printf("\n");
+    printf("0 - Voltar");
+    printf("\n");
+    printf("\n");
+
+    printf("Resposta: ");
+    scanf("%d", &decisao);
+    printf("\n");
+    printf("---------------------------------------------------------");
+	printf("\n");
+	printf("\n");
+
+    return decisao;
+
+}
+
+int configCPU(){
+    int decisao = -1;
+
+    printf("Nome atual do jogador: \"%s\"", jogo.cpu.nome);
+    printf("\n");
+    printf("Nome padrão do jogador: \"Jogador\"");
+    printf("\n");
+    printf("Escolha:");
+    printf("\n");
+    printf("1 - Alterar nome");
+    printf("\n");
+    printf("2 - Restaurar nome padrão");
     printf("\n");
     printf("0 - Voltar");
     printf("\n");
@@ -303,6 +332,14 @@ void restaurarSimb(){
 
 }
 
+void restaurarNomeCPU(){
+    char nomePadrao[7] = {'J','o','g','a','d','o','r'};
+    for(int i = 0; i < 7; i++){
+        jogo.cpu.nome[i] = nomePadrao[i];
+    }
+
+}
+
 void limparEntrada(){
     int extra = getchar();
 
@@ -315,25 +352,14 @@ void limparEntrada(){
     }
 }
 
-void limpar(){
-    int extra;
-
-    extra = getchar();
-
-    if (extra != '\n' && extra != EOF) {
-        while (extra != '\n' && extra != EOF) {
-            extra = getchar();
-        }
-    } else {
-        if (extra == '\n') {
-            ungetc(extra, stdin); // Devolve o '\n' ao buffer
-        }
-    }
+void limparTela(){
+    printf("\e[1;1H\e[2J"); // Escape ANSI para limpar a tela
 }
 
 int main(){
 	setlocale(LC_ALL, "C.UTF-8");
 	bool repetirMenu = false;
+	limparTela();
 
 	do{
 
@@ -397,6 +423,7 @@ int main(){
                 else if(decisao == 0){
                     repetirMenu = true;
                     repetirNovoJogo = false;
+                    limparTela();
                     break;
                 }
 
@@ -452,7 +479,7 @@ int main(){
                                 printf("\n");
 
                                 limparEntrada();
-                                ungetc('\n', stdin);
+                                ungetc('\n', stdin); // Devolve o \n para  buffer
 
                                 if(novoSimbolo[0] == novoSimbolo[1]){
                                     printf("---------------------------------------------------------");
@@ -468,6 +495,9 @@ int main(){
                                     jogo.simbolos[1] = novoSimbolo[1];
 
                                     printf("Novos símbolos: \"%c\" e \"%c\"", novoSimbolo[0], novoSimbolo[1]);
+                                    printf("\n");
+                                    printf("\n");
+                                    printf("---------------------------------------------------------");
                                     printf("\n");
                                     printf("\n");
                                     mensagemMenu("Novos símbolos salvos com sucesso!");
@@ -502,7 +532,70 @@ int main(){
                     } while(repetirConfigSimb);
 
                 }
+                // Configurações de Jogador x CPU
                 else if(decisao == 2){
+                    decisao = -1;
+                    bool repetirConfigCPU = false;
+
+                    do{
+
+                        decisao = configCPU();
+
+                        // Validação da entrada do usuário
+                        if(decisao != 1 && decisao != 2 && decisao != 0){
+                            mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
+                            limparEntrada();
+                            repetirConfigCPU = true;
+                        }
+                        // Alterar nome do Jogador x CPU
+                        else if(decisao == 1){
+
+                            char novoNome[50];
+
+                            printf("Digite o novo nome: ");
+                            limparEntrada();
+                            fgets(novoNome, 50, stdin);
+                            printf("\n");
+
+                            size_t len = strlen(novoNome); // Pega o tamanho do nome digitador
+                            //Removendo o \n do final do nome:
+                            if (len > 0 && novoNome[len - 1] == '\n') {
+                                novoNome[len - 1] = '\0';
+                            }
+
+                            strcpy(jogo.cpu.nome, novoNome); // Salva o novo nome
+
+                            printf("Novo nome: \"%s\"", novoNome);
+                            printf("\n");
+                            printf("\n");
+                            printf("---------------------------------------------------------");
+                            printf("\n");
+                            printf("\n");
+                            mensagemMenu("Novo nome salvo com sucesso!");
+
+                            repetirConfigGeral = true;
+                            repetirConfigCPU = false;
+
+
+                        }
+                        // Restaurar nome padrão
+                        else if(decisao == 2){
+                            restaurarNomeCPU();
+                            mensagemMenu("Nome restaurado com sucesso!");
+
+                            repetirConfigGeral = true;
+                            repetirConfigCPU = false;
+                            break;
+                        }
+                        // Voltar para menu de configurações
+                        else if(decisao == 0){
+                            repetirConfigGeral = true;
+                            repetirConfigCPU = false;
+                            break;
+                        }
+
+                    } while(repetirConfigCPU);
+
 
                 }
                 else if(decisao == 3){
@@ -512,6 +605,7 @@ int main(){
                 else if(decisao == 0){
                     repetirMenu = true;
                     repetirConfigGeral = false;
+                    limparTela();
                     break;
                 }
 
