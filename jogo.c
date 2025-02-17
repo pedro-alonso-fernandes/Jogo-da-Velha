@@ -31,8 +31,9 @@ typedef struct {
 
 typedef struct {
 
-    char tab[3][3];
+    char tab[3][3];    // tabuleiro do jogo
     int jogadas[2][5]; // 2 jogadores com no máximo 5 jogadas
+    char simbolos[2];  // simbolos do jogo (Ex: X e O);
     Casa casas;
     CPU cpu;
     Usuario usuario;
@@ -47,13 +48,16 @@ Jogo jogo = {
     // jogadas[2][5]
     {{-1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1} },
 
+    // simbolos
+    {'X', 'O'},
+
     // struct casas
     { {0}, {1, 2, 3, 4, 5, 6, 7, 8, 9}, 0 },
 
     // struct cpu
     {0, 0, 0, {'U','s','u','á','r','i','o'}}, // Nome padrão: "Usuário"
 
-    //struct usuario
+    // struct usuario
     {{0}, 0, { {'U','s','u','á','r','i','o',' ','1'}, {'U','s','u','á','r','i','o',' ','2'}}} // Nomes padrão: "Usuário 1" e "Usuário 2"
 };
 
@@ -112,7 +116,7 @@ int configGeral(){
 
     printf("Escolha:");
 	printf("\n");
-	printf("1 - Alterar símbolos da partida");
+	printf("1 - Configuração de símbolos da partida");
 	printf("\n");
 	printf("2 - Configuração de Jogador x CPU");
 	printf("\n");
@@ -130,6 +134,34 @@ int configGeral(){
 	printf("\n");
 
     return decisao;
+}
+
+int configSimbolos(){
+    int decisao = -1;
+
+    printf("Símbolos atuais: \"%c\" e \"%c\"", jogo.simbolos[0], jogo.simbolos[1]);
+    printf("\n");
+    printf("Símbolos padrão: \"X\" e \"O\"");
+    printf("\n");
+    printf("Escolha:");
+    printf("\n");
+    printf("1 - Alterar símbolos");
+    printf("\n");
+    printf("2 - Restaurar símbolos padrão");
+    printf("\n");
+    printf("0 - Voltar");
+    printf("\n");
+    printf("\n");
+
+    printf("Resposta: ");
+    scanf("%d", &decisao);
+    printf("\n");
+    printf("---------------------------------------------------------");
+	printf("\n");
+	printf("\n");
+
+    return decisao;
+
 }
 
 int tabuleiro(){
@@ -153,11 +185,20 @@ int tabuleiro(){
 	return casa;
 }
 
-void mensagemErro(char mensagem[100]){
+void mensagemJogo(char mensagem[100]){
 	printf("\n");
 	printf("---------------------------------------------------------");
 	printf("\n");
 	printf("\n");
+	printf("%s", mensagem);
+	printf("\n");
+	printf("\n");
+	printf("---------------------------------------------------------");
+	printf("\n");
+	printf("\n");
+}
+
+void mensagemMenu(char mensagem[100]){
 	printf("%s", mensagem);
 	printf("\n");
 	printf("\n");
@@ -222,7 +263,7 @@ void marcarTabuleiro(int casa, char simbolo){
 		break;
 
 		default:
-		mensagemErro("Erro! Não foi possível marcar o tabuleiro!");
+		mensagemJogo("Erro! Não foi possível marcar o tabuleiro!");
 
 	}
 
@@ -256,6 +297,12 @@ bool verificarVitoria(char simbolo){
     return vitoria;
 }
 
+void restaurarSimb(){
+    jogo.simbolos[0] = 'X';
+    jogo.simbolos[1] = 'O';
+
+}
+
 int main(){
 	setlocale(LC_ALL, "C.UTF-8");
 	bool repetirMenu = false;
@@ -266,9 +313,7 @@ int main(){
 
 		// Validação da entrada do usuário
 		if(decisao != 1 && decisao != 2 && decisao != 0){
-			printf("Não existe essa opção! Escolha uma opção existente!");
-			printf("\n");
-			printf("\n");
+			mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
 			while (getchar() != '\n'); // Limpa o buffer de entrada
 			repetirMenu = true;
 		}
@@ -282,9 +327,7 @@ int main(){
 
                 // Validação da entrada do usuário
                 if(decisao != 1 && decisao != 2 && decisao != 0){
-                    printf("Não existe essa opção! Escolha uma opção existente!");
-                    printf("\n");
-                    printf("\n");
+                   mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
                     while (getchar() != '\n'); // Limpa o buffer de entrada
                     repetirNovoJogo = true;
                 }
@@ -295,13 +338,13 @@ int main(){
                     do{
                         int casa = tabuleiro();
                         if(casa < 1 || casa > 9){
-                            mensagemErro("Não existe uma casa com esse número! Digite um número válido!");
+                            mensagemJogo("Não existe uma casa com esse número! Digite um número válido!");
                             repetirTab = true;
                             continue;
                         }
                         bool usando = verificarCasa(casa);
                         if(usando){
-                            mensagemErro("Erro! A casa selecionada já está sendo usada!");
+                            mensagemJogo("Erro! A casa selecionada já está sendo usada!");
                             repetirTab = true;
                             continue;
                         }
@@ -345,13 +388,44 @@ int main(){
 
                 // Validação da entrada do usuário
                 if(decisao != 1 && decisao != 2 && decisao != 3 && decisao != 0){
-                    printf("Não existe essa opção! Escolha uma opção existente!");
-                    printf("\n");
-                    printf("\n");
+                    mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
                     while (getchar() != '\n'); // Limpa o buffer de entrada
                     repetirConfigGeral = true;
                 }
                 else if(decisao == 1){
+                    decisao = -1;
+                    bool repetirConfigSimb = false;
+
+                    do{
+
+                        decisao = configSimbolos();
+
+                        // Validação da entrada do usuário
+                        if(decisao != 1 && decisao != 2 && decisao != 0){
+                            mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
+                            while (getchar() != '\n'); // Limpa o buffer de entrada
+                            repetirConfigSimb = true;
+                        }
+                        else if(decisao == 1){
+
+                        }
+                        // Restaurar símbolo padrão
+                        else if(decisao == 2){
+                            restaurarSimb();
+                            mensagemMenu("Símbolos restaurados com sucesso!");
+
+                            repetirConfigGeral = true;
+                            repetirConfigSimb = false;
+                            break;
+                        }
+                        // Voltar para menu de configurações
+                        else if(decisao == 0){
+                            repetirConfigGeral = true;
+                            repetirConfigSimb = false;
+                            break;
+                        }
+
+                    } while(repetirConfigSimb);
 
                 }
                 else if(decisao == 2){
