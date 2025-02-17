@@ -303,6 +303,34 @@ void restaurarSimb(){
 
 }
 
+void limparEntrada(){
+    int extra = getchar();
+
+    // Se não for '\n' ou EOF, significa que há caracteres extras no buffer
+    if (extra != '\n' && extra != EOF) {
+        // Limpa o buffer até encontrar '\n' ou EOF
+        while (extra != '\n' && extra != EOF) {
+            extra = getchar();
+        }
+    }
+}
+
+void limpar(){
+    int extra;
+
+    extra = getchar();
+
+    if (extra != '\n' && extra != EOF) {
+        while (extra != '\n' && extra != EOF) {
+            extra = getchar();
+        }
+    } else {
+        if (extra == '\n') {
+            ungetc(extra, stdin); // Devolve o '\n' ao buffer
+        }
+    }
+}
+
 int main(){
 	setlocale(LC_ALL, "C.UTF-8");
 	bool repetirMenu = false;
@@ -314,7 +342,7 @@ int main(){
 		// Validação da entrada do usuário
 		if(decisao != 1 && decisao != 2 && decisao != 0){
 			mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
-			while (getchar() != '\n'); // Limpa o buffer de entrada
+			limparEntrada();
 			repetirMenu = true;
 		}
 		// Novo Jogo:
@@ -328,7 +356,7 @@ int main(){
                 // Validação da entrada do usuário
                 if(decisao != 1 && decisao != 2 && decisao != 0){
                    mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
-                    while (getchar() != '\n'); // Limpa o buffer de entrada
+                    limparEntrada();
                     repetirNovoJogo = true;
                 }
                 // Jogador x CPU:
@@ -349,7 +377,7 @@ int main(){
                             continue;
                         }
                         else{
-                            marcarTabuleiro(casa, 'X');
+                            marcarTabuleiro(casa, jogo.simbolos[0]);
                             repetirTab = true;
 
 
@@ -389,7 +417,7 @@ int main(){
                 // Validação da entrada do usuário
                 if(decisao != 1 && decisao != 2 && decisao != 3 && decisao != 0){
                     mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
-                    while (getchar() != '\n'); // Limpa o buffer de entrada
+                    limparEntrada();
                     repetirConfigGeral = true;
                 }
                 else if(decisao == 1){
@@ -403,10 +431,56 @@ int main(){
                         // Validação da entrada do usuário
                         if(decisao != 1 && decisao != 2 && decisao != 0){
                             mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
-                            while (getchar() != '\n'); // Limpa o buffer de entrada
+                            limparEntrada();
                             repetirConfigSimb = true;
                         }
+                        // Alterar símbolos da partida
                         else if(decisao == 1){
+                            bool repetirNovoSimb = false;
+                            char novoSimbolo[2] = {' ', ' '};
+
+                            do{
+
+
+                                printf("Digite o símbolo 1: ");
+                                limparEntrada();
+                                scanf("%c", &novoSimbolo[0]);
+
+                                printf("Digite o símbolo 2: ");
+                                limparEntrada();
+                                scanf("%c", &novoSimbolo[1]);
+                                printf("\n");
+
+                                limparEntrada();
+                                ungetc('\n', stdin);
+
+                                if(novoSimbolo[0] == novoSimbolo[1]){
+                                    printf("---------------------------------------------------------");
+                                    printf("\n");
+                                    printf("\n");
+                                    mensagemMenu("Erro! Os símbolos não podem ser iguais!");
+                                    repetirNovoSimb = true;
+                                    continue;
+
+                                }
+                                else{
+                                    jogo.simbolos[0] = novoSimbolo[0];
+                                    jogo.simbolos[1] = novoSimbolo[1];
+
+                                    printf("Novos símbolos: \"%c\" e \"%c\"", novoSimbolo[0], novoSimbolo[1]);
+                                    printf("\n");
+                                    printf("\n");
+                                    mensagemMenu("Novos símbolos salvos com sucesso!");
+
+                                    repetirConfigGeral = true;
+                                    repetirConfigSimb = false;
+                                    repetirNovoSimb = false;
+                                    break;
+                                }
+
+
+                            } while(repetirNovoSimb);
+
 
                         }
                         // Restaurar símbolo padrão
