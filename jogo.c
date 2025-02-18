@@ -9,7 +9,7 @@ typedef struct {
 
     int vitorias[2];
     int empates;
-    char nome[2][50];
+    char nome[2][15];
 
 }Jogador;
 
@@ -18,7 +18,7 @@ typedef struct {
     int vitorias;
     int empates;
     int derrotas;
-    char nome[50];
+    char nome[15];
 
 }CPU;
 
@@ -35,6 +35,7 @@ typedef struct {
     char tab[3][3];    // tabuleiro do jogo
     int jogadas[2][5]; // 2 jogadores com no máximo 5 jogadas
     char simbolos[2];  // simbolos do jogo (Ex: X e O);
+    int rodada;
     Casa casas;
     CPU cpu;
     Jogador jogador;
@@ -51,6 +52,9 @@ Jogo jogo = {
 
     // simbolos
     {'X', 'O'},
+
+    // rodada
+    0,
 
     // struct casas
     { {0}, {1, 2, 3, 4, 5, 6, 7, 8, 9}, 0 },
@@ -223,7 +227,34 @@ int configJogador(){
 
 }
 
-int tabuleiro(){
+int tabuleiro(int decisao){
+
+    printf("---------------------------------------------------------");
+    printf("\n");
+    printf("\n");
+    printf("                        RODADA %d", jogo.rodada);
+    printf("\n");
+    printf("\n");
+
+    // Placar de Jogador x CPU
+    if(decisao == 1){
+        char nomeCPU[3];
+        strcpy(nomeCPU, "CPU");
+
+        printf("|-----------------------------------------------------|\n");
+        printf("|                        PLACAR                       |\n");
+        printf("|-----------------|-----------------------------------|\n");
+        printf("| %15s |      Vitórias: %d       Empates: %d |\n", jogo.cpu.nome, jogo.cpu.vitorias, jogo.cpu.empates);
+        printf("|-----------------|-----------------------------------|\n");
+        printf("| %15s |      Vitórias: %d       Empates: %d |\n", nomeCPU, jogo.cpu.derrotas, jogo.cpu.empates);
+        printf("|-----------------|-----------------------------------|\n");
+        printf("\n");
+        printf("\n");
+    }
+
+    printf("");
+
+
 
 	printf("    |     |               |    |    \n");
 	printf(" %c  |  %c  |  %c         1  | 2  | 3  \n", jogo.tab[0][0], jogo.tab[0][1], jogo.tab[0][2]);
@@ -274,10 +305,12 @@ void salvarMudancas(int casa){
 
 }
 
-void marcarTabuleiro(int casa, char simbolo){
+void marcarTabuleiro(int casa, char simbolo, int numJogador){
+    int index = numJogador - 1;
 	switch (casa){
 		case 1:
 		jogo.tab[0][0] = simbolo;
+		//jogo.jogadas[index][]
         salvarMudancas(casa);
 		break;
 
@@ -399,6 +432,7 @@ int main(){
 	setlocale(LC_ALL, "C.UTF-8");
 	bool repetirMenu = false;
 	limparTela();
+	nome();
 
 	do{
 
@@ -427,9 +461,11 @@ int main(){
                 // Jogador x CPU:
                 else if(decisao == 1){
 
+                    limparTela();
                     bool repetirTab = false;
                     do{
-                        int casa = tabuleiro();
+                        int casa = tabuleiro(decisao);
+
                         if(casa < 1 || casa > 9){
                             mensagemJogo("Não existe uma casa com esse número! Digite um número válido!");
                             repetirTab = true;
@@ -442,7 +478,7 @@ int main(){
                             continue;
                         }
                         else{
-                            marcarTabuleiro(casa, jogo.simbolos[0]);
+                            marcarTabuleiro(casa, jogo.simbolos[0], 1);
                             repetirTab = true;
 
 
@@ -471,6 +507,7 @@ int main(){
 
 
 		}
+
 		// Configurações
 		else if(decisao == 2){
             decisao = -1;
