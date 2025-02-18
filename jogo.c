@@ -36,6 +36,7 @@ typedef struct {
     int jogadas[2][5]; // 2 jogadores com no máximo 5 jogadas
     char simbolos[2];  // simbolos do jogo (Ex: X e O);
     int rodada;
+    int turno;
     Casa casas;
     CPU cpu;
     Jogador jogador;
@@ -54,6 +55,9 @@ Jogo jogo = {
     {'X', 'O'},
 
     // rodada
+    1,
+
+    //turno
     0,
 
     // struct casas
@@ -70,7 +74,7 @@ Jogo jogo = {
 int menu(){
 	int decisao = -1;
 
-	printf("---------------------Jogo da Velha-----------------------");
+	printf("------------------------Jogo da Velha--------------------------");
 	printf("\n");
 	printf("\n");
 	printf("Escolha:");
@@ -86,7 +90,7 @@ int menu(){
 	printf("Resposta: ");
 	scanf("%d", &decisao);
 	printf("\n");
-	printf("---------------------------------------------------------");
+	printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 
@@ -109,7 +113,7 @@ int novoJogo(){
 	printf("Resposta: ");
 	scanf("%d", &decisao);
 	printf("\n");
-	printf("---------------------------------------------------------");
+	printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 
@@ -134,7 +138,7 @@ int configGeral(){
 	printf("Resposta: ");
 	scanf("%d", &decisao);
 	printf("\n");
-	printf("---------------------------------------------------------");
+	printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 
@@ -161,7 +165,7 @@ int configSimbolos(){
     printf("Resposta: ");
     scanf("%d", &decisao);
     printf("\n");
-    printf("---------------------------------------------------------");
+    printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 
@@ -189,7 +193,7 @@ int configCPU(){
     printf("Resposta: ");
     scanf("%d", &decisao);
     printf("\n");
-    printf("---------------------------------------------------------");
+    printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 
@@ -219,7 +223,7 @@ int configJogador(){
     printf("Resposta: ");
     scanf("%d", &decisao);
     printf("\n");
-    printf("---------------------------------------------------------");
+    printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 
@@ -227,9 +231,13 @@ int configJogador(){
 
 }
 
+void limparTela(){
+    printf("\e[1;1H\e[2J"); // Escape ANSI para limpar a tela
+}
+
 int tabuleiro(int decisao){
 
-    printf("---------------------------------------------------------");
+    printf("---------------------------------------------------------------");
     printf("\n");
     printf("\n");
     printf("                        RODADA %d", jogo.rodada);
@@ -250,21 +258,33 @@ int tabuleiro(int decisao){
         printf("|-----------------|-----------------------------------|\n");
         printf("\n");
         printf("\n");
+
+
+        if(jogo.turno == 0){
+            printf("                   Vez de %s", jogo.cpu.nome);
+        }
+        else if(jogo.turno == 1){
+            printf("                   Vez da CPU");
+        }
+
+        printf("\n");
+        printf("\n");
+        printf("\n");
+
     }
 
-    printf("");
 
 
-
-	printf("    |     |               |    |    \n");
-	printf(" %c  |  %c  |  %c         1  | 2  | 3  \n", jogo.tab[0][0], jogo.tab[0][1], jogo.tab[0][2]);
-	printf("____|_____|____       ____|____|____\n");
-	printf("    |     |               |    |    \n");
-	printf(" %c  |  %c  |  %c         4  | 5  | 6  \n", jogo.tab[1][0], jogo.tab[1][1], jogo.tab[1][2]);
-	printf("____|_____|____       ____|____|____\n");
-	printf("    |     |               |    |    \n");
-	printf(" %c  |  %c  |  %c         7  | 8  | 9  \n", jogo.tab[2][0], jogo.tab[2][1], jogo.tab[2][2]);
-	printf("    |     |               |    |    \n");
+	printf("             |     |               |    |    \n");
+	printf("          %c  |  %c  |  %c         1  | 2  | 3  \n", jogo.tab[0][0], jogo.tab[0][1], jogo.tab[0][2]);
+	printf("         ____|_____|____       ____|____|____\n");
+	printf("             |     |               |    |    \n");
+	printf("          %c  |  %c  |  %c         4  | 5  | 6  \n", jogo.tab[1][0], jogo.tab[1][1], jogo.tab[1][2]);
+	printf("         ____|_____|____       ____|____|____\n");
+	printf("             |     |               |    |    \n");
+	printf("          %c  |  %c  |  %c         7  | 8  | 9  \n", jogo.tab[2][0], jogo.tab[2][1], jogo.tab[2][2]);
+	printf("             |     |               |    |    \n");
+	printf("\n");
 	printf("\n");
 
 	int casa = -1;
@@ -277,13 +297,10 @@ int tabuleiro(int decisao){
 
 void mensagemJogo(char mensagem[100]){
 	printf("\n");
-	printf("---------------------------------------------------------");
+	printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 	printf("%s", mensagem);
-	printf("\n");
-	printf("\n");
-	printf("---------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 }
@@ -292,7 +309,7 @@ void mensagemMenu(char mensagem[100]){
 	printf("%s", mensagem);
 	printf("\n");
 	printf("\n");
-	printf("---------------------------------------------------------");
+	printf("---------------------------------------------------------------");
 	printf("\n");
 	printf("\n");
 }
@@ -305,8 +322,8 @@ void salvarMudancas(int casa){
 
 }
 
-void marcarTabuleiro(int casa, char simbolo, int numJogador){
-    int index = numJogador - 1;
+void marcarTabuleiro(int casa, char simbolo, int indexJogador){
+
 	switch (casa){
 		case 1:
 		jogo.tab[0][0] = simbolo;
@@ -424,15 +441,10 @@ void limparEntrada(){
     }
 }
 
-void limparTela(){
-    printf("\e[1;1H\e[2J"); // Escape ANSI para limpar a tela
-}
-
 int main(){
 	setlocale(LC_ALL, "C.UTF-8");
 	bool repetirMenu = false;
 	limparTela();
-	nome();
 
 	do{
 
@@ -466,19 +478,26 @@ int main(){
                     do{
                         int casa = tabuleiro(decisao);
 
+                        // Verifica se a entrada di usuário foi válida
                         if(casa < 1 || casa > 9){
+                            limparTela();
+                            limparEntrada();
                             mensagemJogo("Não existe uma casa com esse número! Digite um número válido!");
                             repetirTab = true;
                             continue;
                         }
                         bool usando = verificarCasa(casa);
+                        // Se a casa já estiver em uso
                         if(usando){
+                            limparTela();
                             mensagemJogo("Erro! A casa selecionada já está sendo usada!");
                             repetirTab = true;
                             continue;
                         }
+                        // Marcando a casa
                         else{
-                            marcarTabuleiro(casa, jogo.simbolos[0], 1);
+                            marcarTabuleiro(casa, jogo.simbolos[0], 0);
+                            limparTela();
                             repetirTab = true;
 
 
@@ -558,7 +577,7 @@ int main(){
                                 ungetc('\n', stdin); // Devolve o \n para  buffer
 
                                 if(novoSimbolo[0] == novoSimbolo[1]){
-                                    printf("---------------------------------------------------------");
+                                    printf("---------------------------------------------------------------");
                                     printf("\n");
                                     printf("\n");
                                     mensagemMenu("Erro! Os símbolos não podem ser iguais!");
@@ -573,7 +592,7 @@ int main(){
                                     printf("Novos símbolos: \"%c\" e \"%c\"", novoSimbolo[0], novoSimbolo[1]);
                                     printf("\n");
                                     printf("\n");
-                                    printf("---------------------------------------------------------");
+                                    printf("---------------------------------------------------------------");
                                     printf("\n");
                                     printf("\n");
                                     mensagemMenu("Novos símbolos salvos com sucesso!");
@@ -642,7 +661,7 @@ int main(){
                             printf("Novo nome: \"%s\"", novoNome);
                             printf("\n");
                             printf("\n");
-                            printf("---------------------------------------------------------");
+                            printf("---------------------------------------------------------------");
                             printf("\n");
                             printf("\n");
                             mensagemMenu("Novo nome salvo com sucesso!");
@@ -710,7 +729,7 @@ int main(){
                                 int comp = strcmp(novoNome, jogo.jogador.nome[outroIndex]);
                                 // Se os nomes forem iguais
                                 if(comp == 0){
-                                    printf("---------------------------------------------------------");
+                                    printf("---------------------------------------------------------------");
                                     printf("\n");
                                     printf("\n");
                                     mensagemMenu("Erro! Os nomes dos jogadores não podem ser iguais!");
@@ -726,7 +745,7 @@ int main(){
                                     printf("Novo nome: \"%s\"", novoNome);
                                     printf("\n");
                                     printf("\n");
-                                    printf("---------------------------------------------------------");
+                                    printf("---------------------------------------------------------------");
                                     printf("\n");
                                     printf("\n");
                                     mensagemMenu("Novo nome salvo com sucesso!");
@@ -775,7 +794,7 @@ int main(){
 			printf("Encerrando o programa...");
 			printf("\n");
 			printf("\n");
-            printf("---------------------------------------------------------");
+            printf("---------------------------------------------------------------");
             printf("\n");
 			repetirMenu = false;
 		}
