@@ -11,7 +11,7 @@ typedef struct {
     int empates;
     char nome[2][50];
 
-}Usuario;
+}Jogador;
 
 typedef struct {
 
@@ -37,7 +37,7 @@ typedef struct {
     char simbolos[2];  // simbolos do jogo (Ex: X e O);
     Casa casas;
     CPU cpu;
-    Usuario usuario;
+    Jogador jogador;
 
 }Jogo;
 
@@ -58,7 +58,7 @@ Jogo jogo = {
     // struct cpu
     {0, 0, 0, {'J','o','g','a','d','o','r'}}, // Nome padrão: "Jogador"
 
-    // struct usuario
+    // struct jogador
     {{0}, 0, { {'J','o','g','a','d','o','r',' ','1'}, {'J','o','g','a','d','o','r',' ','2'}}} // Nomes padrão: "Jogador 1" e "Jogador 2"
 };
 
@@ -177,6 +177,36 @@ int configCPU(){
     printf("1 - Alterar nome");
     printf("\n");
     printf("2 - Restaurar nome padrão");
+    printf("\n");
+    printf("0 - Voltar");
+    printf("\n");
+    printf("\n");
+
+    printf("Resposta: ");
+    scanf("%d", &decisao);
+    printf("\n");
+    printf("---------------------------------------------------------");
+	printf("\n");
+	printf("\n");
+
+    return decisao;
+
+}
+
+int configJogador(){
+    int decisao = -1;
+
+    printf("Nome atual dos jogadores: \"%s\" e \"%s\"", jogo.jogador.nome[0], jogo.jogador.nome[1]);
+    printf("\n");
+    printf("Nome padrão dos jogadores: \"Jogador 1\" e \"Jogador 2\"");
+    printf("\n");
+    printf("Escolha:");
+    printf("\n");
+    printf("1 - Alterar nome do Jogador 1");
+    printf("\n");
+    printf("2 - Alterar nome do Jogador 2");
+    printf("\n");
+    printf("3 - Restaurar nome padrão");
     printf("\n");
     printf("0 - Voltar");
     printf("\n");
@@ -338,6 +368,15 @@ void restaurarNomeCPU(){
         jogo.cpu.nome[i] = nomePadrao[i];
     }
 
+}
+
+void restaurarNomeJogadores(){
+    char nomePadrao[2][9] = {{'J','o','g','a','d','o','r', ' ', '1'}, {'J','o','g','a','d','o','r', ' ', '2'}};
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 9; j++){
+            jogo.jogador.nome[i][j] = nomePadrao[i][j];
+        }
+    }
 }
 
 void limparEntrada(){
@@ -502,8 +541,7 @@ int main(){
                                     printf("\n");
                                     mensagemMenu("Novos símbolos salvos com sucesso!");
 
-                                    repetirConfigGeral = true;
-                                    repetirConfigSimb = false;
+                                    repetirConfigSimb = true;
                                     repetirNovoSimb = false;
                                     break;
                                 }
@@ -518,9 +556,8 @@ int main(){
                             restaurarSimb();
                             mensagemMenu("Símbolos restaurados com sucesso!");
 
-                            repetirConfigGeral = true;
-                            repetirConfigSimb = false;
-                            break;
+                            repetirConfigSimb = true;
+                            continue;
                         }
                         // Voltar para menu de configurações
                         else if(decisao == 0){
@@ -557,7 +594,7 @@ int main(){
                             fgets(novoNome, 50, stdin);
                             printf("\n");
 
-                            size_t len = strlen(novoNome); // Pega o tamanho do nome digitador
+                            size_t len = strlen(novoNome); // Pega o tamanho do nome digitado
                             //Removendo o \n do final do nome:
                             if (len > 0 && novoNome[len - 1] == '\n') {
                                 novoNome[len - 1] = '\0';
@@ -573,8 +610,7 @@ int main(){
                             printf("\n");
                             mensagemMenu("Novo nome salvo com sucesso!");
 
-                            repetirConfigGeral = true;
-                            repetirConfigCPU = false;
+                            repetirConfigCPU = true;
 
 
                         }
@@ -583,9 +619,8 @@ int main(){
                             restaurarNomeCPU();
                             mensagemMenu("Nome restaurado com sucesso!");
 
-                            repetirConfigGeral = true;
-                            repetirConfigCPU = false;
-                            break;
+                            repetirConfigCPU = true;
+                            continue;
                         }
                         // Voltar para menu de configurações
                         else if(decisao == 0){
@@ -598,7 +633,94 @@ int main(){
 
 
                 }
+                // Configuração Jogador x Jogador
                 else if(decisao == 3){
+                    decisao = -1;
+                    bool repetirConfigJogador = false;
+
+                    do{
+
+                        decisao = configJogador();
+
+                        // Validação da entrada do usuário
+                        if(decisao != 1 && decisao != 2 && decisao != 3 && decisao != 0){
+                            mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
+                            limparEntrada();
+                            repetirConfigJogador = true;
+                        }
+                        // Alterar nome do Jogador 1
+                        else if(decisao == 1 || decisao == 2){
+                            int index = decisao - 1;
+                            // Usando operador ternário ao invés de if e else
+                            int outroIndex = (index == 0) ? 1 : 0; // Se o index for zero, o outro index vai ser 1. Caso contrário, o outro index vai ser 0
+
+                            bool repetirNovoNome = false;
+                            do {
+                                char novoNome[50];
+
+                                printf("Digite o novo nome: ");
+                                limparEntrada();
+                                fgets(novoNome, 50, stdin);
+                                printf("\n");
+
+                                size_t len = strlen(novoNome); // Pega o tamanho do nome digitado
+                                //Removendo o \n do final do nome:
+                                if (len > 0 && novoNome[len - 1] == '\n') {
+                                    novoNome[len - 1] = '\0';
+                                }
+
+                                // Verificando se os nomes são iguais
+                                int comp = strcmp(novoNome, jogo.jogador.nome[outroIndex]);
+                                // Se os nomes forem iguais
+                                if(comp == 0){
+                                    printf("---------------------------------------------------------");
+                                    printf("\n");
+                                    printf("\n");
+                                    mensagemMenu("Erro! Os nomes dos jogadores não podem ser iguais!");
+
+                                    ungetc('\n', stdin); // Devolve o \n para  buffer
+                                    repetirNovoNome = true;
+                                    continue;
+                                }
+                                else{
+
+                                    strcpy(jogo.jogador.nome[index], novoNome); // Salva o novo nome
+
+                                    printf("Novo nome: \"%s\"", novoNome);
+                                    printf("\n");
+                                    printf("\n");
+                                    printf("---------------------------------------------------------");
+                                    printf("\n");
+                                    printf("\n");
+                                    mensagemMenu("Novo nome salvo com sucesso!");
+
+                                    repetirConfigJogador = true;
+                                    repetirNovoNome = false;
+                                    break;
+                                }
+
+                            } while(repetirNovoNome);
+
+
+
+
+                        }
+                        // Restaurar nomes padrão
+                        else if(decisao == 3){
+                            restaurarNomeJogadores();
+                            mensagemMenu("Nomes restaurados com sucesso!");
+
+                            repetirConfigJogador = true;
+                            continue;
+                        }
+                        // Voltar para menu de configurações
+                        else if(decisao == 0){
+                            repetirConfigGeral = true;
+                            repetirConfigJogador = false;
+                            break;
+                        }
+
+                    } while(repetirConfigJogador);
 
                 }
                 // Voltar para o Menu principal
