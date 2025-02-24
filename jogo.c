@@ -413,20 +413,15 @@ void restaurarSimb(){
 }
 
 void restaurarNomeCPU(){
-    char nomePadrao[7] = {'J','o','g','a','d','o','r'};
-    for(int i = 0; i < 7; i++){
-        jogo.cpu.nome[i] = nomePadrao[i];
-    }
+    char nomePadrao[8] = {'J','o','g','a','d','o','r', '\0'};
+    strcpy(jogo.cpu.nome, nomePadrao);
 
 }
 
 void restaurarNomeJogadores(){
-    char nomePadrao[2][9] = {{'J','o','g','a','d','o','r', ' ', '1'}, {'J','o','g','a','d','o','r', ' ', '2'}};
-    for(int i = 0; i < 2; i++){
-        for(int j = 0; j < 9; j++){
-            jogo.jogador.nome[i][j] = nomePadrao[i][j];
-        }
-    }
+    char nomePadrao[2][10] = {{'J','o','g','a','d','o','r', ' ', '1', '\0'}, {'J','o','g','a','d','o','r', ' ', '2', '\0'}};
+    strcpy(jogo.jogador.nome[0], nomePadrao[0]);
+    strcpy(jogo.jogador.nome[1], nomePadrao[1]);
 }
 
 void limparEntrada(){
@@ -447,7 +442,7 @@ int main(){
 	limparTela();
 
 	do{
-
+	
 		int decisao = menu();
 
 		// Validação da entrada do usuário
@@ -643,11 +638,11 @@ int main(){
                         // Alterar nome do Jogador x CPU
                         else if(decisao == 1){
 
-                            char novoNome[50];
+                            char novoNome[15];
 
                             printf("Digite o novo nome: ");
                             limparEntrada();
-                            fgets(novoNome, 50, stdin);
+                            fgets(novoNome, 15, stdin);
                             printf("\n");
 
                             size_t len = strlen(novoNome); // Pega o tamanho do nome digitado
@@ -706,17 +701,17 @@ int main(){
                         }
                         // Alterar nome do Jogador 1
                         else if(decisao == 1 || decisao == 2){
-                            int index = decisao - 1;
+                            int index = decisao - 1; // index do nome que está sendo alterado
                             // Usando operador ternário ao invés de if e else
                             int outroIndex = (index == 0) ? 1 : 0; // Se o index for zero, o outro index vai ser 1. Caso contrário, o outro index vai ser 0
 
                             bool repetirNovoNome = false;
                             do {
-                                char novoNome[50];
+                                char novoNome[15];
 
                                 printf("Digite o novo nome: ");
                                 limparEntrada();
-                                fgets(novoNome, 50, stdin);
+                                fgets(novoNome, 15, stdin);
                                 printf("\n");
 
                                 size_t len = strlen(novoNome); // Pega o tamanho do nome digitado
