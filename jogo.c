@@ -4,12 +4,13 @@
 #include <locale.h>
 #include <string.h>
 
+#define tamNome 15
 
 typedef struct {
 
     int vitorias[2];
     int empates;
-    char nome[2][15];
+    char nome[2][tamNome];
 
 }Jogador;
 
@@ -18,7 +19,7 @@ typedef struct {
     int vitorias;
     int empates;
     int derrotas;
-    char nome[15];
+    char nome[tamNome];
 
 }CPU;
 
@@ -442,7 +443,7 @@ int main(){
 	limparTela();
 
 	do{
-	
+
 		int decisao = menu();
 
 		// Validação da entrada do usuário
@@ -638,17 +639,20 @@ int main(){
                         // Alterar nome do Jogador x CPU
                         else if(decisao == 1){
 
-                            char novoNome[15];
+                            char novoNome[tamNome];
 
-                            printf("Digite o novo nome: ");
+                            printf("Digite o novo nome (máximo de 15 caracteres): \n");
                             limparEntrada();
-                            fgets(novoNome, 15, stdin);
+                            fgets(novoNome, tamNome, stdin);
                             printf("\n");
 
                             size_t len = strlen(novoNome); // Pega o tamanho do nome digitado
                             //Removendo o \n do final do nome:
                             if (len > 0 && novoNome[len - 1] == '\n') {
                                 novoNome[len - 1] = '\0';
+                            }
+                            else {
+                                limparEntrada();
                             }
 
                             strcpy(jogo.cpu.nome, novoNome); // Salva o novo nome
@@ -707,26 +711,36 @@ int main(){
 
                             bool repetirNovoNome = false;
                             do {
-                                char novoNome[15];
+                                char novoNome[tamNome];
 
-                                printf("Digite o novo nome: ");
+                                printf("Digite o novo nome (máximo de 15 caracteres): \n");
                                 limparEntrada();
-                                fgets(novoNome, 15, stdin);
+                                fgets(novoNome, tamNome, stdin);
                                 printf("\n");
 
                                 size_t len = strlen(novoNome); // Pega o tamanho do nome digitado
-                                //Removendo o \n do final do nome:
                                 if (len > 0 && novoNome[len - 1] == '\n') {
+                                    // Removendo o \n do final do nome:
                                     novoNome[len - 1] = '\0';
                                 }
+                                else {
+                                    // Se o nome não tiver um \n no final, significa que o usuário ultrapassou o limite de
+                                    // caracteres
+                                    limparEntrada();
+                                }
 
-                                // Verificando se os nomes são iguais
-                                int comp = strcmp(novoNome, jogo.jogador.nome[outroIndex]);
-                                // Se os nomes forem iguais
-                                if(comp == 0){
+                                printf("Novo nome: \"%s\"", novoNome);
+                                    printf("\n");
+                                    printf("\n");
                                     printf("---------------------------------------------------------------");
                                     printf("\n");
                                     printf("\n");
+
+                                // Verificando se os nomes são iguais
+                                int comp = strcmp(novoNome, jogo.jogador.nome[outroIndex]);
+
+                                if(comp == 0){
+                                    // Se os nomes forem iguais
                                     mensagemMenu("Erro! Os nomes dos jogadores não podem ser iguais!");
 
                                     ungetc('\n', stdin); // Devolve o \n para  buffer
@@ -737,12 +751,7 @@ int main(){
 
                                     strcpy(jogo.jogador.nome[index], novoNome); // Salva o novo nome
 
-                                    printf("Novo nome: \"%s\"", novoNome);
-                                    printf("\n");
-                                    printf("\n");
-                                    printf("---------------------------------------------------------------");
-                                    printf("\n");
-                                    printf("\n");
+
                                     mensagemMenu("Novo nome salvo com sucesso!");
 
                                     repetirConfigJogador = true;
