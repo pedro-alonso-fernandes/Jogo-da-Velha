@@ -37,7 +37,7 @@ typedef struct {
     int jogadas[2][5]; // 2 jogadores com no máximo 5 jogadas
     char simbolos[2];  // simbolos do jogo (Ex: X e O);
     int rodada;
-    int turno;
+    int turno;         // Turno = 0: vez do jogador 1, turno = 1: vez do jogador 2
     Casa casas;
     CPU cpu;
     Jogador jogador;
@@ -236,6 +236,37 @@ void limparTela(){
     printf("\e[1;1H\e[2J"); // Escape ANSI para limpar a tela
 }
 
+void placarCPU(){
+
+    char nomeCPU[3];
+    strcpy(nomeCPU, "CPU");
+
+    printf("|-----------------------------------------------------|\n");
+    printf("|                        PLACAR                       |\n");
+    printf("|-----------------|-----------------------------------|\n");
+    printf("| %15s |      Vitórias: %d       Empates: %d |\n", jogo.cpu.nome, jogo.cpu.vitorias, jogo.cpu.empates);
+    printf("|-----------------|-----------------------------------|\n");
+    printf("| %15s |      Vitórias: %d       Empates: %d |\n", nomeCPU, jogo.cpu.derrotas, jogo.cpu.empates);
+    printf("|-----------------|-----------------------------------|\n");
+    printf("\n");
+    printf("\n");
+
+}
+
+void placarJogador(){
+
+    printf("|-----------------------------------------------------|\n");
+    printf("|                        PLACAR                       |\n");
+    printf("|-----------------|-----------------------------------|\n");
+    printf("| %15s |      Vitórias: %d       Empates: %d |\n", jogo.jogador.nome[0], jogo.jogador.vitorias[0], jogo.jogador.empates);
+    printf("|-----------------|-----------------------------------|\n");
+    printf("| %15s |      Vitórias: %d       Empates: %d |\n", jogo.jogador.nome[1], jogo.jogador.vitorias[1], jogo.jogador.empates);
+    printf("|-----------------|-----------------------------------|\n");
+    printf("\n");
+    printf("\n");
+
+}
+
 int tabuleiro(int decisao){
 
     printf("---------------------------------------------------------------");
@@ -247,19 +278,7 @@ int tabuleiro(int decisao){
 
     // Placar de Jogador x CPU
     if(decisao == 1){
-        char nomeCPU[3];
-        strcpy(nomeCPU, "CPU");
-
-        printf("|-----------------------------------------------------|\n");
-        printf("|                        PLACAR                       |\n");
-        printf("|-----------------|-----------------------------------|\n");
-        printf("| %15s |      Vitórias: %d       Empates: %d |\n", jogo.cpu.nome, jogo.cpu.vitorias, jogo.cpu.empates);
-        printf("|-----------------|-----------------------------------|\n");
-        printf("| %15s |      Vitórias: %d       Empates: %d |\n", nomeCPU, jogo.cpu.derrotas, jogo.cpu.empates);
-        printf("|-----------------|-----------------------------------|\n");
-        printf("\n");
-        printf("\n");
-
+        placarCPU();
 
         if(jogo.turno == 0){
             printf("                   Vez de %s", jogo.cpu.nome);
@@ -268,13 +287,18 @@ int tabuleiro(int decisao){
             printf("                   Vez da CPU");
         }
 
-        printf("\n");
-        printf("\n");
-        printf("\n");
+    }
+    // Placar de Jogador x Jogador
+    else if(decisao == 2){
+        placarJogador();
+
+        printf("                   Vez de %s", jogo.jogador.nome[jogo.turno]);
 
     }
 
-
+    printf("\n");
+    printf("\n");
+    printf("\n");
 
 	printf("             |     |               |    |    \n");
 	printf("          %c  |  %c  |  %c         1  | 2  | 3  \n", jogo.tab[0][0], jogo.tab[0][1], jogo.tab[0][2]);
@@ -323,12 +347,11 @@ void salvarMudancas(int casa){
 
 }
 
-void marcarTabuleiro(int casa, char simbolo, int indexJogador){
+void marcarTabuleiro(int casa, char simbolo){
 
 	switch (casa){
 		case 1:
 		jogo.tab[0][0] = simbolo;
-		//jogo.jogadas[index][]
         salvarMudancas(casa);
 		break;
 
@@ -396,13 +419,39 @@ bool verificarCasa(int casa){
 bool verificarVitoria(char simbolo){
     bool vitoria = false;
 
-//    for(int i = 0; i < 3; i++){
-//        for(int j = 0; j < 3; j++){
-//            if(tab[i][j] == simbolo){
-//
-//            }
-//        }
-//    }
+    for(int i = 0; i < 3; i++){
+        // Linhas
+        if(jogo.tab[i][0] == simbolo && jogo.tab[i][1] == simbolo && jogo.tab[i][2] == simbolo){
+            vitoria = true;
+            break;
+        }
+        // Colunas
+        else if(jogo.tab[0][i] == simbolo && jogo.tab[1][i] == simbolo && jogo.tab[2][i] == simbolo){
+            vitoria = true;
+            break;
+        }
+    }
+
+    if(!vitoria){
+        // Primeira Diagonal
+        if(jogo.tab[0][0] == simbolo && jogo.tab[1][1] == simbolo && jogo.tab[2][2] == simbolo){
+            vitoria = true;
+        }
+        // Segunda Diagonal
+        else if(jogo.tab[0][2] == simbolo && jogo.tab[1][1] == simbolo && jogo.tab[2][0] == simbolo){
+            vitoria = true;
+        }
+        // O simbolo passado não ganhou
+        else {
+            if(jogo.turno == 0){
+                jogo.turno = 1;
+            }
+            else {
+                jogo.turno = 0;
+                jogo.rodada++;
+            }
+        }
+    }
 
     return vitoria;
 }
@@ -492,9 +541,18 @@ int main(){
                         }
                         // Marcando a casa
                         else{
-                            marcarTabuleiro(casa, jogo.simbolos[0], 0);
+                            marcarTabuleiro(casa, jogo.simbolos[jogo.turno]);
                             limparTela();
-                            repetirTab = true;
+                            bool vitoria = verificarVitoria(jogo.simbolos[jogo.turno]);
+                            if(!vitoria){
+                                repetirTab = true;
+                                // Fazer a parte da CPU
+                            }
+                            else{
+                                repetirTab = false;
+                                // Fazer tela de vitoria
+                                break;
+                            }
 
 
                         }
@@ -505,7 +563,45 @@ int main(){
                 // Jogador x Jogador
                 else if(decisao == 2){
 
+                    limparTela();
+                    bool repetirTab = false;
+                    do{
+                        int casa = tabuleiro(decisao);
 
+                        // Verifica se a entrada di usuário foi válida
+                        if(casa < 1 || casa > 9){
+                            limparTela();
+                            limparEntrada();
+                            mensagemJogo("Não existe uma casa com esse número! Digite um número válido!");
+                            repetirTab = true;
+                            continue;
+                        }
+                        bool usando = verificarCasa(casa);
+                        // Se a casa já estiver em uso
+                        if(usando){
+                            limparTela();
+                            mensagemJogo("Erro! A casa selecionada já está sendo usada!");
+                            repetirTab = true;
+                            continue;
+                        }
+                        // Marcando a casa
+                        else{
+                            marcarTabuleiro(casa, jogo.simbolos[jogo.turno]);
+                            limparTela();
+                            bool vitoria = verificarVitoria(jogo.simbolos[jogo.turno]);
+                            if(!vitoria){
+                                repetirTab = true;
+                            }
+                            else{
+                                // Fazer tela de vitoria
+                                repetirTab = false;
+                                break;
+                            }
+
+
+                        }
+
+                    } while(repetirTab);
 
 
                 }
