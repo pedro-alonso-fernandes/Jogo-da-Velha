@@ -388,6 +388,47 @@ int telaVitoria(int decisao){
     return escolha;
 }
 
+int telaEmpate(){
+
+    printf("---------------------------------------------------------------");
+    printf("\n");
+    printf("\n");
+
+    printf("                        EMPATE!");
+
+    printf("\n");
+    printf("\n");
+    printf("\n");
+
+	printf("                       |     |          \n");
+	printf("                    %c  |  %c  |  %c    \n", jogo.tab[0][0], jogo.tab[0][1], jogo.tab[0][2]);
+	printf("                   ____|_____|____      \n");
+	printf("                       |     |          \n");
+	printf("                    %c  |  %c  |  %c    \n", jogo.tab[1][0], jogo.tab[1][1], jogo.tab[1][2]);
+	printf("                   ____|_____|____      \n");
+	printf("                       |     |          \n");
+	printf("                    %c  |  %c  |  %c    \n", jogo.tab[2][0], jogo.tab[2][1], jogo.tab[2][2]);
+	printf("                       |     |          \n");
+	printf("\n");
+	printf("\n");
+
+	int escolha = -1;
+	printf("Escolha: ");
+	printf("\n");
+	printf("\n");
+	printf("1 - Jogar Novamente");
+	printf("\n");
+	printf("2 - Voltar para o Menu Principal");
+	printf("\n");
+	printf("\n");
+
+	printf("Resposta: ");
+	scanf("%d", &escolha);
+	printf("\n");
+
+    return escolha;
+}
+
 void mensagemJogo(char mensagem[100]){
 	printf("\n");
 	printf("---------------------------------------------------------------");
@@ -549,7 +590,7 @@ void reiniciarJogo(){
         }
     }
 
-    jogo.rodada = 0;
+    jogo.rodada = 1;
     jogo.turno = 0;
     jogo.casas.indiceUsadas = 0;
 
@@ -682,10 +723,48 @@ int main(){
                         else{
                             marcarTabuleiro(casa, jogo.simbolos[jogo.turno]);
                             limparTela();
+
                             bool vitoria = verificarVitoria(jogo.simbolos[jogo.turno]);
                             // Ninguém ganhou
                             if(!vitoria){
-                                repetirTab = true;
+                                // Verifica o empate
+                                if(jogo.rodada == 5 && jogo.turno == 1){
+                                    jogo.jogador.empates++;
+                                    bool repetirEmpate = false;
+
+                                    do{
+                                        int escolha = telaEmpate();
+                                        limparTela();
+
+                                        // Validação da entrada do usuário
+                                        if(escolha != 1 && escolha != 2){
+                                            mensagemJogo("Não existe essa opção! Escolha uma opção existente!");
+                                            limparEntrada();
+                                            repetirEmpate = true;
+                                        }
+                                        // Começa outra partida no mesmo modo
+                                        else if(escolha == 1){
+                                            reiniciarJogo();
+                                            repetirEmpate = false;
+                                            repetirTab = true;
+                                            break;
+                                        }
+                                        // Volta para o menu principal
+                                        else if(escolha == 2){
+                                            reiniciarJogo();
+                                            repetirEmpate = false;
+                                            repetirTab = false;
+                                            repetirNovoJogo = false;
+                                            repetirMenu = true;
+                                            break;
+                                        }
+
+                                    }while(repetirEmpate);
+                                }
+                                // Não houve empate
+                                else{
+                                    repetirTab = true;
+                                }
                             }
                             // Um jogador venceu
                             else{
