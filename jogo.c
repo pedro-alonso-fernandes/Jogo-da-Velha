@@ -267,7 +267,7 @@ void placarJogador(){
 
 }
 
-int tabuleiro(int decisao){
+void tabuleiro(int decisao){
 
     printf("---------------------------------------------------------------");
     printf("\n");
@@ -276,13 +276,17 @@ int tabuleiro(int decisao){
     printf("\n");
     printf("\n");
 
+
+
     // Placar de Jogador x CPU
     if(decisao == 1){
         placarCPU();
 
+        // Vez do Jogador
         if(jogo.turno == 0){
             printf("                   Vez de %s", jogo.cpu.nome);
         }
+        // Vez da CPU
         else if(jogo.turno == 1){
             printf("                   Vez da CPU");
         }
@@ -312,12 +316,76 @@ int tabuleiro(int decisao){
 	printf("\n");
 	printf("\n");
 
-	int casa = -1;
-	printf("Resposta: ");
-	scanf("%d", &casa);
+}
+
+int telaVitoria(int decisao){
+
+    printf("---------------------------------------------------------------");
+    printf("\n");
+    printf("\n");
+
+    // Placar de Jogador x CPU
+    if(decisao == 1){
+    placarCPU();
+
+        // Vez do Jogador
+        if(jogo.turno == 0){
+            printf("                        PARABÉNS!");
+            printf("\n");
+            printf("\n");
+            printf("                   VOCÊ VENCEU!");
+        }
+        // Vez da CPU
+        else if(jogo.turno == 1){
+            printf("                   CPU VENCEU!");
+        }
+
+    }
+    // Placar de Jogador x Jogador
+    else if(decisao ==2){
+        placarJogador();
+
+        printf("                        PARABÉNS!");
+        printf("\n");
+        printf("\n");
+
+        printf("                   %s VENCEU!", jogo.jogador.nome[jogo.turno]);
+
+    }
+
+
+
+    printf("\n");
+    printf("\n");
+    printf("\n");
+
+	printf("                       |     |          \n");
+	printf("                    %c  |  %c  |  %c    \n", jogo.tab[0][0], jogo.tab[0][1], jogo.tab[0][2]);
+	printf("                   ____|_____|____      \n");
+	printf("                       |     |          \n");
+	printf("                    %c  |  %c  |  %c    \n", jogo.tab[1][0], jogo.tab[1][1], jogo.tab[1][2]);
+	printf("                   ____|_____|____      \n");
+	printf("                       |     |          \n");
+	printf("                    %c  |  %c  |  %c    \n", jogo.tab[2][0], jogo.tab[2][1], jogo.tab[2][2]);
+	printf("                       |     |          \n");
+	printf("\n");
 	printf("\n");
 
-	return casa;
+	int escolha = -1;
+	printf("Escolha: ");
+	printf("\n");
+	printf("\n");
+	printf("1 - Jogar Novamente");
+	printf("\n");
+	printf("2 - Voltar para o Menu Principal");
+	printf("\n");
+	printf("\n");
+
+	printf("Resposta: ");
+	scanf("%d", &escolha);
+	printf("\n");
+
+    return escolha;
 }
 
 void mensagemJogo(char mensagem[100]){
@@ -474,6 +542,23 @@ void restaurarNomeJogadores(){
     strcpy(jogo.jogador.nome[1], nomePadrao[1]);
 }
 
+void reiniciarJogo(){
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 3; j++){
+            jogo.tab[i][j] = ' ';
+        }
+    }
+
+    jogo.rodada = 0;
+    jogo.turno = 0;
+    jogo.casas.indiceUsadas = 0;
+
+    for(int i = 0; i < 9; i++){
+        jogo.casas.usadas[i] = 0;
+        jogo.casas.restantes[i] = i + 1;
+    }
+}
+
 void limparEntrada(){
     int extra = getchar();
 
@@ -511,7 +596,7 @@ int main(){
 
                 // Validação da entrada do usuário
                 if(decisao != 1 && decisao != 2 && decisao != 0){
-                   mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
+                    mensagemMenu("Não existe essa opção! Escolha uma opção existente!");
                     limparEntrada();
                     repetirNovoJogo = true;
                 }
@@ -521,7 +606,12 @@ int main(){
                     limparTela();
                     bool repetirTab = false;
                     do{
-                        int casa = tabuleiro(decisao);
+
+                        tabuleiro(decisao);
+                        int casa = -1;
+                        printf("Resposta: ");
+                        scanf("%d", &casa);
+                        printf("\n");
 
                         // Verifica se a entrada di usuário foi válida
                         if(casa < 1 || casa > 9){
@@ -566,7 +656,11 @@ int main(){
                     limparTela();
                     bool repetirTab = false;
                     do{
-                        int casa = tabuleiro(decisao);
+                        tabuleiro(decisao);
+                        int casa = -1;
+                        printf("Resposta: ");
+                        scanf("%d", &casa);
+                        printf("\n");
 
                         // Verifica se a entrada di usuário foi válida
                         if(casa < 1 || casa > 9){
@@ -589,13 +683,45 @@ int main(){
                             marcarTabuleiro(casa, jogo.simbolos[jogo.turno]);
                             limparTela();
                             bool vitoria = verificarVitoria(jogo.simbolos[jogo.turno]);
+                            // Ninguém ganhou
                             if(!vitoria){
                                 repetirTab = true;
                             }
+                            // Um jogador venceu
                             else{
-                                // Fazer tela de vitoria
-                                repetirTab = false;
-                                break;
+                                jogo.jogador.vitorias[jogo.turno]++;
+
+                                bool repetirVitoria = false;
+
+                                do{
+                                    int escolha = telaVitoria(decisao);
+                                    limparTela();
+
+                                    // Validação da entrada do usuário
+                                    if(escolha != 1 && escolha != 2){
+                                        mensagemJogo("Não existe essa opção! Escolha uma opção existente!");
+                                        limparEntrada();
+                                        repetirVitoria = true;
+                                    }
+                                    // Começa outra partida no mesmo modo
+                                    else if(escolha == 1){
+                                        reiniciarJogo();
+                                        repetirVitoria = false;
+                                        repetirTab = true;
+                                        break;
+                                    }
+                                    // Volta para o menu principal
+                                    else if(escolha == 2){
+                                        reiniciarJogo();
+                                        repetirVitoria = false;
+                                        repetirTab = false;
+                                        repetirNovoJogo = false;
+                                        repetirMenu = true;
+                                        break;
+                                    }
+
+                                }while(repetirVitoria);
+
                             }
 
 
