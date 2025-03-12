@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include <locale.h>
 #include <string.h>
+#include <windows.h>
+#include <unistd.h>
+#include <time.h>
 
 #define tamNome 15
 
@@ -511,6 +514,22 @@ void marcarTabuleiro(int casa, char simbolo){
 
 }
 
+void jogadaCPU(){
+    tamanhoVetor = 9;
+
+    srand(time(NULL)); // Inicializa o gerador de números aleatórios com base no tempo atual
+    int indiceAleatorio = rand() % tamanhoVetor; // Gera um índice aleatório dentro do tamanho do vetor
+
+    while (indiceAleatorio == 0){
+        indiceAleatorio = rand() % tamanhoVetor;
+    }
+
+    int casa = jogo.casas.restantes[indiceAleatorio];
+
+    marcarTabuleiro(casa, jogo.simbolos[1]);
+
+}
+
 bool verificarCasa(int casa){
 	bool usando = false;
 
@@ -643,7 +662,6 @@ int main(){
                 }
                 // Jogador x CPU:
                 else if(decisao == 1){
-
                     limparTela();
                     bool repetirTab = false;
                     do{
@@ -672,17 +690,89 @@ int main(){
                         }
                         // Marcando a casa
                         else{
-                            marcarTabuleiro(casa, jogo.simbolos[jogo.turno]);
+                            marcarTabuleiro(casa, jogo.simbolos[0]);
                             limparTela();
-                            bool vitoria = verificarVitoria(jogo.simbolos[jogo.turno]);
+                            bool vitoria = verificarVitoria(jogo.simbolos[0]);
+                            // Ninguém ganhou
                             if(!vitoria){
-                                repetirTab = true;
-                                // Fazer a parte da CPU
+                                // Verifica o empate
+                                if(jogo.rodada == 5 && jogo.turno == 1){
+                                    jogo.jogador.empates++;
+                                    bool repetirEmpate = false;
+
+                                    do{
+                                        int escolha = telaEmpate();
+                                        limparTela();
+
+                                        // Validação da entrada do usuário
+                                        if(escolha != 1 && escolha != 2){
+                                            mensagemJogo("Não existe essa opção! Escolha uma opção existente!");
+                                            limparEntrada();
+                                            repetirEmpate = true;
+                                        }
+                                        // Começa outra partida no mesmo modo
+                                        else if(escolha == 1){
+                                            reiniciarJogo();
+                                            repetirEmpate = false;
+                                            repetirTab = true;
+                                            break;
+                                        }
+                                        // Volta para o menu principal
+                                        else if(escolha == 2){
+                                            reiniciarJogo();
+                                            repetirEmpate = false;
+                                            repetirTab = false;
+                                            repetirNovoJogo = false;
+                                            repetirMenu = true;
+                                            break;
+                                        }
+
+                                    }while(repetirEmpate);
+                                }
+                                // Não houve empate
+                                else{
+                                    // Jogada da CPU
+                                    tabuleiro();
+                                    sleep(2);
+                                    jogadaCPU();
+                                    repetirTab = true;
+                                }
                             }
+                            // Um jogador venceu
                             else{
-                                repetirTab = false;
-                                // Fazer tela de vitoria
-                                break;
+                                jogo.jogador.vitorias[jogo.turno]++;
+
+                                bool repetirVitoria = false;
+
+                                do{
+                                    int escolha = telaVitoria(decisao);
+                                    limparTela();
+
+                                    // Validação da entrada do usuário
+                                    if(escolha != 1 && escolha != 2){
+                                        mensagemJogo("Não existe essa opção! Escolha uma opção existente!");
+                                        limparEntrada();
+                                        repetirVitoria = true;
+                                    }
+                                    // Começa outra partida no mesmo modo
+                                    else if(escolha == 1){
+                                        reiniciarJogo();
+                                        repetirVitoria = false;
+                                        repetirTab = true;
+                                        break;
+                                    }
+                                    // Volta para o menu principal
+                                    else if(escolha == 2){
+                                        reiniciarJogo();
+                                        repetirVitoria = false;
+                                        repetirTab = false;
+                                        repetirNovoJogo = false;
+                                        repetirMenu = true;
+                                        break;
+                                    }
+
+                                }while(repetirVitoria);
+
                             }
 
 
