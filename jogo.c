@@ -336,16 +336,16 @@ int telaVitoria(int decisao){
             printf("                        PARABÉNS!");
             printf("\n");
             printf("\n");
-            printf("                   VOCÊ VENCEU!");
+            printf("                      VOCÊ VENCEU!");
         }
         // Vez da CPU
         else if(jogo.turno == 1){
-            printf("                   CPU VENCEU!");
+            printf("                       CPU VENCEU!");
         }
 
     }
     // Placar de Jogador x Jogador
-    else if(decisao ==2){
+    else if(decisao == 2){
         placarJogador();
 
         printf("                        PARABÉNS!");
@@ -391,11 +391,20 @@ int telaVitoria(int decisao){
     return escolha;
 }
 
-int telaEmpate(){
+int telaEmpate(int decisao){
 
     printf("---------------------------------------------------------------");
     printf("\n");
     printf("\n");
+
+    // Placar de Jogador x CPU
+    if(decisao == 1){
+        placarCPU();
+    }
+    // Placar de Jogador x Jogador
+    else if(decisao == 2){
+        placarJogador();
+    }
 
     printf("                        EMPATE!");
 
@@ -515,16 +524,18 @@ void marcarTabuleiro(int casa, char simbolo){
 }
 
 void jogadaCPU(){
-    tamanhoVetor = 9;
+    int tamanhoVetor = 9;
 
     srand(time(NULL)); // Inicializa o gerador de números aleatórios com base no tempo atual
     int indiceAleatorio = rand() % tamanhoVetor; // Gera um índice aleatório dentro do tamanho do vetor
 
-    while (indiceAleatorio == 0){
+    int casa = jogo.casas.restantes[indiceAleatorio];
+
+    while (casa == 0){
         indiceAleatorio = rand() % tamanhoVetor;
+        casa = jogo.casas.restantes[indiceAleatorio];
     }
 
-    int casa = jogo.casas.restantes[indiceAleatorio];
 
     marcarTabuleiro(casa, jogo.simbolos[1]);
 
@@ -693,15 +704,15 @@ int main(){
                             marcarTabuleiro(casa, jogo.simbolos[0]);
                             limparTela();
                             bool vitoria = verificarVitoria(jogo.simbolos[0]);
-                            // Ninguém ganhou
+                            // Jogador não ganhou
                             if(!vitoria){
                                 // Verifica o empate
                                 if(jogo.rodada == 5 && jogo.turno == 1){
-                                    jogo.jogador.empates++;
+                                    jogo.cpu.empates++;
                                     bool repetirEmpate = false;
 
                                     do{
-                                        int escolha = telaEmpate();
+                                        int escolha = telaEmpate(decisao);
                                         limparTela();
 
                                         // Validação da entrada do usuário
@@ -732,15 +743,59 @@ int main(){
                                 // Não houve empate
                                 else{
                                     // Jogada da CPU
-                                    tabuleiro();
+                                    tabuleiro(decisao);
                                     sleep(2);
+                                    limparTela();
                                     jogadaCPU();
-                                    repetirTab = true;
+
+                                    bool vitoria = verificarVitoria(jogo.simbolos[1]);
+                                    // CPU não ganhou
+                                    if(!vitoria){
+                                        repetirTab = true;
+                                    }
+                                    // CPU ganhou
+                                    else{
+
+                                        jogo.cpu.derrotas++;
+
+                                        bool repetirVitoria = false;
+
+                                        do{
+                                            int escolha = telaVitoria(decisao);
+                                            limparTela();
+
+                                            // Validação da entrada do usuário
+                                            if(escolha != 1 && escolha != 2){
+                                                mensagemJogo("Não existe essa opção! Escolha uma opção existente!");
+                                                limparEntrada();
+                                                repetirVitoria = true;
+                                            }
+                                            // Começa outra partida no mesmo modo
+                                            else if(escolha == 1){
+                                                reiniciarJogo();
+                                                repetirVitoria = false;
+                                                repetirTab = true;
+                                                break;
+                                            }
+                                            // Volta para o menu principal
+                                            else if(escolha == 2){
+                                                reiniciarJogo();
+                                                repetirVitoria = false;
+                                                repetirTab = false;
+                                                repetirNovoJogo = false;
+                                                repetirMenu = true;
+                                                break;
+                                            }
+
+                                        }while(repetirVitoria);
+
+                                    }
+
                                 }
                             }
-                            // Um jogador venceu
+                            // Jogador venceu
                             else{
-                                jogo.jogador.vitorias[jogo.turno]++;
+                                jogo.cpu.vitorias++;
 
                                 bool repetirVitoria = false;
 
@@ -823,7 +878,7 @@ int main(){
                                     bool repetirEmpate = false;
 
                                     do{
-                                        int escolha = telaEmpate();
+                                        int escolha = telaEmpate(decisao);
                                         limparTela();
 
                                         // Validação da entrada do usuário
