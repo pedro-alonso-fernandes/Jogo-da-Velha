@@ -37,7 +37,6 @@ typedef struct {
 typedef struct {
 
     char tab[3][3];    // tabuleiro do jogo
-    int jogadas[2][5]; // 2 jogadores com no máximo 5 jogadas
     char simbolos[2];  // simbolos do jogo (Ex: X e O);
     int rodada;
     int turno;         // Turno = 0: vez do jogador 1, turno = 1: vez do jogador 2
@@ -51,9 +50,6 @@ typedef struct {
 Jogo jogo = {
     // tab[3][3]
     {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}},
-
-    // jogadas[2][5]
-    {{-1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1} },
 
     // simbolos
     {'X', 'O'},
