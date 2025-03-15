@@ -1,6 +1,6 @@
 # Jogo da Velha - Trabalho Final
 
-Este repositório contém a implementação de um jogo da velha (Tic-Tac-Toe) em linguagem C, desenvolvido como trabalho final da disciplina **Introdução à Ciência da Computação**. O projeto inclui um **executável pronto para Windows (*jogo.exe*) e Linux (*jogo*)**, permitindo que o usuário jogue sem precisar compilar o código-fonte.
+Este repositório contém a implementação de um jogo da velha em linguagem C, desenvolvido como trabalho final da disciplina **Introdução à Ciência da Computação**. O projeto inclui um **executável pronto para Windows (*jogo.exe*) e Linux (*jogo*)**, permitindo que o usuário jogue sem precisar compilar o código-fonte.
 
 ## 📌 Objetivo do Projeto
 
