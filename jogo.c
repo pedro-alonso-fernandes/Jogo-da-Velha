@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <locale.h>
 #include <string.h>
-#include <windows.h>
 #include <unistd.h>
 #include <time.h>
 
